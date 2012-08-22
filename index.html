@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	
+		<title>test</title>
+		
+		<style type="text/css">
+			/*
+			 *reset
+			 */
+			html, body, div, span, applet, object, iframe,
+			h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+			a, abbr, acronym, address, big, cite, code,
+			del, dfn, em, img, ins, kbd, q, s, samp,
+			small, strike, strong, sub, sup, tt, var,
+			b, u, i, center,
+			dl, dt, dd, ol, ul, li,
+			fieldset, form, label, legend,
+			table, caption, tbody, tfoot, thead, tr, th, td,
+			article, aside, canvas, details, embed, 
+			figure, figcaption, footer, header, hgroup, 
+			menu, nav, output, ruby, section, summary,
+			time, mark, audio, video {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				font-size: 100%;
+				font: inherit;
+				vertical-align: baseline;
+			}
+			/* HTML5 display-role reset for older browsers */
+			article, aside, details, figcaption, figure, 
+			footer, header, hgroup, menu, nav, section {
+				display: block;
+			}
+			body {
+				line-height: 1;
+			}
+			ol, ul {
+				list-style: none;
+			}
+			blockquote, q {
+				quotes: none;
+			}
+			blockquote:before, blockquote:after,
+			q:before, q:after {
+				content: '';
+				content: none;
+			}
+			table {
+				border-collapse: collapse;
+				border-spacing: 0;
+			}
+			
+			/*
+			 * thumpicker styles
+			 */
+			
+			.thumbpicker { position: relative; width: 790px; height: 110px; background: #888; margin: 0 auto; overflow: hidden; }
+			.thumbpicker > ul { position: absolute; top: 0; left: 0; white-space: nowrap; }
+			.thumbpicker > ul > li { width: 150px; height: 110px; background: #9d9d9d; margin-left: 10px; }
+			.thumbpicker > ul > li:first-child { margin-left: 0; }
+			*+.thumbpicker > ul > li { float: left; zoom: 1; display: block; }
+			.thumbpicker > ul > li > a { display: block; font-size: 30px; line-height: 110px; color: #fff; text-align: center; text-decoration: none; }
+			
+			#display { font-size: 15px; line-height: 15px; margin: 10px; text-align: center; }
+			#display > ul > li { display: block; }
+		</style>
+		
+	</head>
+	<body>
+		<div id="display">
+			<ul>
+				<li id="is-ie">IE? <span></span></li>
+				<li id="cont-wid">container width: <span></span></li>
+				<li id="ul-wid">ul width: <span></span></li>
+				<li id="clientx">client x: <span>nan</span></li>
+				<li id="bodyleft">body left: <span>nan</span></li>
+				<li id="mousex">,mouseX: <span></span></li>
+				<li id="pct">percent: <span></span></li>
+				<li id="ul_targ_pos">ul target position: <span></span></li>
+				<li id="curpos">ul current pos: <span></span></li>
+				<li id="diff">difference: <span></span></li>
+				<li id="ease">ease: <span></span></li>
+				<li id="step">step: <span></span></li>
+			</ul>
+		</div>
+		<div class="thumbpicker" id="tp">
+			<ul>
+				<li><a href="#one">1</a></li>
+				<li><a href="#one">2</a></li>
+				<li><a href="#one">3</a></li>
+				<li><a href="#one">4</a></li>
+				<li><a href="#one">5</a></li>
+				<li><a href="#one">6</a></li>
+				<li><a href="#one">7</a></li>
+				<li><a href="#one">8</a></li>
+				<li><a href="#one">9</a></li>
+				<li><a href="#one">10</a></li>
+			</ul>
+		</div>
+		
+		<script type="text/javascript">
+			Math.easeInQuad = function (t, b, c, d) {
+				t /= d;
+				return c*t*t + b;
+			};
+			Math.easeOutQuad = function (t, b, c, d) {
+				t /= d;
+				return -c * t*(t-2) + b;
+			};
+			
+			var FS = {};
+			
+			FS.IE = document.all?true:false;
+			
+			FS.thumbpicker = function(args) {
+				var container = args.container,
+					scrollpad = args.scrollpad || 0,
+					ul = container.getElementsByTagName('ul')[0],
+					thumb_width = ul.getElementsByTagName('li')[0].offsetWidth,
+					container_width = container.offsetWidth,
+					scrollable_width = container_width - (scrollpad*2),
+					ul_width = ul.offsetWidth,
+					ul_scrollable_width = ul_width - container_width,
+					requestAnimFrame =
+						window.requestAnimationFrame ||
+						window.webkitRequestAnimationFrame ||
+						window.mozRequestAnimationFrame ||
+						window.oRequestAnimationFrame ||
+						window.msRequestAnimationFrame ||
+						function(fn) {
+							//Just 30 fps, because that's enough for those legacy browsers
+							window.setTimeout(fn, 1000 / 30);
+						},
+					mousex = 0,
+					istickon = false;
+				//alert(ul_width+', '+container_width+', '+ul_scrollable_width);
+				
+				document.getElementById('is-ie').getElementsByTagName('span')[0].innerHTML = FS.IE;
+				document.getElementById('cont-wid').getElementsByTagName('span')[0].innerHTML = container_width;
+				document.getElementById('ul-wid').getElementsByTagName('span')[0].innerHTML = ul_width;
+				
+				var disp_mx = document.getElementById('mousex').getElementsByTagName('span')[0],
+					client_x = document.getElementById('clientx').getElementsByTagName('span')[0],
+					bodyleft = document.getElementById('bodyleft').getElementsByTagName('span')[0],
+					disp_pct = document.getElementById('pct').getElementsByTagName('span')[0],
+					disp_ultargpos = document.getElementById('ul_targ_pos').getElementsByTagName('span')[0],
+					disp_diff = document.getElementById('diff').getElementsByTagName('span')[0],
+					disp_ease = document.getElementById('ease').getElementsByTagName('span')[0],
+					disp_curpos = document.getElementById('curpos').getElementsByTagName('span')[0],
+					disp_step = document.getElementById('step').getElementsByTagName('span')[0];
+				
+				var setMouseX = function(e) {
+					istickon = true;
+					
+					var parentoffset = container.offsetLeft,
+						tempx;
+					
+					if (FS.IE) { // grab the x-y pos.s if browser is IE
+					    tempx = event.clientX /*+ document.body.scrollLeft  */- parentoffset - scrollpad;
+					    client_x.innerHTML = event.clientX;
+					    bodyleft.innerHTML = document.body.scrollLeft;
+					} else {  // grab the x-y pos.s if browser is non-retarded
+					    tempx = e.pageX - parentoffset - scrollpad;
+					}  
+					  
+					if (tempx < 0){tempx = 0}
+					if (tempx > scrollable_width) {tempx = scrollable_width}
+					mousex = tempx;
+					//console.log(mousex);
+					disp_mx.innerHTML = mousex;
+					tick();
+				}
+				
+				var tick = function() {
+					requestAnimFrame(function() {
+						var pct = mousex/scrollable_width,
+							targetpos = Math.round(ul_scrollable_width*pct),
+							currentpos = -(ul.style.left.substr(0, ul.style.left.length-2)) || 0,
+							diff = targetpos - currentpos;
+						
+						///console.log(diff);
+						
+						disp_pct.innerHTML = pct;
+						disp_ultargpos.innerHTML = Math.round(ul_scrollable_width*pct);
+						disp_diff.innerHTML = diff;
+						disp_curpos.innerHTML = currentpos;
+						
+						if(diff!==0) {
+							var easedStep = Math.ceil(Math.easeInQuad(diff, 0, 1, ul_scrollable_width)*55);
+							disp_ease.innerHTML = easedStep;
+							var newpos;
+							if(currentpos>targetpos) {
+								newpos = currentpos-easedStep;
+							}else {
+								newpos = currentpos+easedStep;
+							}
+							disp_step.innerHTML = -newpos+'px';
+							ul.style.left = -newpos+'px';
+							
+							tick();
+						}
+					});
+				}
+				
+				container.onmousemove = setMouseX;
+			}
+			
+			FS.thumbpicker({
+				container: document.getElementById('tp'),
+				scrollpad: 80
+				});
+			/*
+			Math.easeInQuad = function (t, b, c, d) {
+				t /= d;
+				return c*t*t + b;
+			};
+			
+			for(var i=0; i<30; i++) {
+				
+				console.log(Math.easeInQuad(i,0,1,29)*55);
+			}
+			*/
+			//console.log('live'+requestAnimFrame);
+		</script>
+	
+	</body>
+</html>
