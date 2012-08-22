@@ -59,9 +59,8 @@
 			
 			.thumbpicker { position: relative; width: 790px; height: 110px; background: #888; margin: 0 auto; overflow: hidden; }
 			.thumbpicker > ul { position: absolute; top: 0; left: 0; white-space: nowrap; }
-			.thumbpicker > ul > li { width: 150px; height: 110px; background: #9d9d9d; margin-left: 10px; }
+			.thumbpicker > ul > li { width: 150px; height: 110px; background: #9d9d9d; margin-left: 10px; display: inline-block; *display:inline; *zoom: 1; }
 			.thumbpicker > ul > li:first-child { margin-left: 0; }
-			*+.thumbpicker > ul > li { float: left; zoom: 1; display: block; }
 			.thumbpicker > ul > li > a { display: block; font-size: 30px; line-height: 110px; color: #fff; text-align: center; text-decoration: none; }
 			
 			#display { font-size: 15px; line-height: 15px; margin: 10px; text-align: center; }
@@ -181,22 +180,31 @@
 							currentpos = -(ul.style.left.substr(0, ul.style.left.length-2)) || 0,
 							diff = targetpos - currentpos;
 						
-						///console.log(diff);
-						
 						disp_pct.innerHTML = pct;
 						disp_ultargpos.innerHTML = Math.round(ul_scrollable_width*pct);
+						
 						disp_diff.innerHTML = diff;
 						disp_curpos.innerHTML = currentpos;
 						
 						if(diff!==0) {
-							var easedStep = Math.ceil(Math.easeInQuad(diff, 0, 1, ul_scrollable_width)*55);
+							var easedStep = (Math.easeOutQuad(diff, 0, 1, ul_scrollable_width)*55),
+								math,
+								newpos;
+							console.log(easedStep);
 							disp_ease.innerHTML = easedStep;
-							var newpos;
+							
 							if(currentpos>targetpos) {
-								newpos = currentpos-easedStep;
+								math = Math.floor;
+								//newpos = Math.floor(currentpos+easedStep);
+								//newpos = targetpos+easedStep;
+								//newpos = Math.floor(targetpos+easedStep);
 							}else {
-								newpos = currentpos+easedStep;
+								math = Math.ceil;
+								//newpos = Math.ceil(currentpos+easedStep);
+								//newpos = targetpos-easedStep;
+								//newpos = Math.ceil(targetpos-easedStep);
 							}
+							newpos = math(currentpos+easedStep);
 							disp_step.innerHTML = -newpos+'px';
 							ul.style.left = -newpos+'px';
 							
@@ -220,9 +228,9 @@
 			
 			for(var i=0; i<30; i++) {
 				
-				console.log(Math.easeInQuad(i,0,1,29)*55);
-			}
-			*/
+				console.log(Math.easeOutQuad(i,0,1,29)*4);
+			}*/
+			
 			//console.log('live'+requestAnimFrame);
 		</script>
 	
