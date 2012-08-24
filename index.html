@@ -57,9 +57,9 @@
 			 * thumpicker styles
 			 */
 			
-			.thumbpicker { position: relative; width: 805px; height: 110px; background: #888; margin: 0 auto; overflow: hidden; }
+			.thumbpicker { position: relative; width: 790px; height: 110px; background: #888; margin: 0 auto; overflow: hidden; }
 			.thumbpicker > ul { position: absolute; top: 0; left: 0; white-space: nowrap; }
-			.thumbpicker > ul > li { width: 150px; height: 110px; background: #9d9d9d; margin: 0 0 0 10px; display: inline-block; *display:inline; *zoom: 1; }
+			.thumbpicker > ul > li { width: 150px; height: 110px; background: #9d9d9d; margin: 0 0 0 10px; vertical-align: top; display: inline-block; *display:inline; *zoom: 1; }
 			.thumbpicker > ul > li:first-child { margin-left: 0; }
 			.thumbpicker > ul > li > a { display: block; font-size: 30px; line-height: 110px; color: #dfdfdf; text-align: center; text-decoration: none; }
 			.thumbpicker > ul > li.selected,
@@ -91,20 +91,7 @@
 		</div>
 		<div class="thumbpicker" id="tp">
 			<ul>
-				<li><a href="#one">1</a></li>
-				<li><a href="#one">2</a></li>
-				<li><a href="#one">3</a></li>
-				<li><a href="#one">4</a></li>
-				<li><a href="#one">5</a></li>
-				<li><a href="#one">6</a></li>
-				<li><a href="#one">7</a></li>
-				<li><a href="#one">8</a></li>
-				<li><a href="#one">9</a></li>
-				<li><a href="#one">10</a></li>
-				<li><a href="#one">11</a></li>
-				<li><a href="#one">12</a></li>
-				<li><a href="#one">13</a></li>
-				<li><a href="#one">14</a></li>
+				<li><a href="#one">1</a></li><li><a href="#one">2</a></li><li><a href="#one">3</a></li><li><a href="#one">4</a></li><li><a href="#one">5</a></li><li><a href="#one">6</a></li><li><a href="#one">7</a></li><li><a href="#one">8</a></li><li><a href="#one">9</a></li><li><a href="#one">10</a></li><li><a href="#one">11</a></li><li><a href="#one">12</a></li><li><a href="#one">13</a></li><li><a href="#one">14</a></li>
 			</ul>
 		</div>
 		
@@ -135,6 +122,7 @@
 					scrollable_width = container_width - (scrollpad*2),
 					ul_width = ul.offsetWidth,
 					ul_scrollable_width = ul_width - container_width,
+					tick_multiplyer = FS.IE? 80 : 70,
 					requestAnimFrame =
 						window.requestAnimationFrame ||
 						window.webkitRequestAnimationFrame ||
@@ -155,8 +143,9 @@
 				selected_li.className = SELECTED;
 				
 				function onLiHit(e) {
-					//console.log(e)
-					if(e) {
+					//console.log('on li hit');
+					//console.log(this);
+					if(this!==window) {
 						//console.log('hit had event');
 						var self=this;
 						selected_li = self;
@@ -177,8 +166,6 @@
 						if(self.className!==SELECTED) {
 							self.className = HOVER;
 						}
-						/*clearTimeout(mouseout_to);
-						clearTimeout(slideshow_to);*/
 						return false;
 					}
 					lisi.onmouseout = function(e) {
@@ -186,23 +173,25 @@
 						if(self.className!==SELECTED) {
 							self.className = '';
 						}
-						/*clearTimeout(mouseout_to);
-						clearTimeout(slideshow_to);*/
 						return false;
 					}
 					lisi.onmouseup = onLiHit;
 				}
-				/*for(i=0; i<anchors.length; i++) {
+				for(i=0; i<anchors.length; i++) {
 					var anc = anchors[i];
-					anc.onmouseover = function(e) {
+					anc.onmouseup = function(e) {
+						//alert('hit');
+						return false;
+					}
+					/*anc.onmouseover = function(e) {
 						clearTimeout(mouseout_to);
 						clearTimeout(slideshow_to);
 					}
 					anc.onmouseout = function(e) {
 						clearTimeout(mouseout_to);
 						clearTimeout(slideshow_to);
-					}
-				}*/
+					}*/
+				}
 				
 				document.getElementById('is-ie').getElementsByTagName('span')[0].innerHTML = FS.IE;
 				document.getElementById('cont-wid').getElementsByTagName('span')[0].innerHTML = container_width;
@@ -245,9 +234,10 @@
 				function onScrubIdle(e) {
 					clearTimeout(mouseout_to);
 					mouseout_to = window.setTimeout(function() {
+						
 						var li_left= selected_li.offsetLeft;
 						
-						if(isslideshow) { if(e) { slideshow(); }}
+						if(isslideshow) { slideshow(); }
 						
 						if(li_left<container_width) {
 							mousex = 0;
@@ -301,7 +291,7 @@
 						disp_curpos.innerHTML = currentpos;
 						
 						if(diff!==0) {
-							var easedStep = Math.easeOutQuad(diff, 0, 1, ul_scrollable_width)*55,
+							var easedStep = Math.easeOutQuad(diff, 0, 1, ul_scrollable_width)*tick_multiplyer,
 								math,
 								newpos;
 							//console.log(easedStep);
