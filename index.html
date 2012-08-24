@@ -177,15 +177,32 @@
 						if(self.className!==SELECTED) {
 							self.className = HOVER;
 						}
+						/*clearTimeout(mouseout_to);
+						clearTimeout(slideshow_to);*/
+						return false;
 					}
 					lisi.onmouseout = function(e) {
 						var self=this;
 						if(self.className!==SELECTED) {
 							self.className = '';
 						}
+						/*clearTimeout(mouseout_to);
+						clearTimeout(slideshow_to);*/
+						return false;
 					}
 					lisi.onmouseup = onLiHit;
 				}
+				/*for(i=0; i<anchors.length; i++) {
+					var anc = anchors[i];
+					anc.onmouseover = function(e) {
+						clearTimeout(mouseout_to);
+						clearTimeout(slideshow_to);
+					}
+					anc.onmouseout = function(e) {
+						clearTimeout(mouseout_to);
+						clearTimeout(slideshow_to);
+					}
+				}*/
 				
 				document.getElementById('is-ie').getElementsByTagName('span')[0].innerHTML = FS.IE;
 				document.getElementById('cont-wid').getElementsByTagName('span')[0].innerHTML = container_width;
@@ -202,7 +219,6 @@
 					disp_step = document.getElementById('step').getElementsByTagName('span')[0];
 				
 				var setMouseX = function(e) {
-					istickon = true;
 					clearTimeout(mouseout_to);
 					clearTimeout(slideshow_to);
 					
@@ -221,11 +237,13 @@
 					if (tempx > scrollable_width) {tempx = scrollable_width}
 					mousex = tempx;
 					disp_mx.innerHTML = mousex;
-					tick();
+					
+					if(!istickon) { tick(); }
 				}
 				
 				
 				function onScrubIdle(e) {
+					clearTimeout(mouseout_to);
 					mouseout_to = window.setTimeout(function() {
 						var li_left= selected_li.offsetLeft;
 						
@@ -241,12 +259,13 @@
 							//console.log(li_left+', '+ul_scrollable_width+', '+pct);
 							mousex = scrollable_width*pct;
 						}
-						tick();
+						if(!istickon) { tick(); }
 						
 					}, 50);
 				}
 				
 				function slideshow() {
+					clearTimeout(slideshow_to);
 					slideshow_to = window.setTimeout(function() {
 						/*
 						 * Should elimate first for loop here and save selected_li as an int instead of an element
@@ -268,6 +287,7 @@
 				}
 				
 				var tick = function() {
+					istickon=true;
 					requestAnimFrame(function() {
 						var pct = mousex/scrollable_width,
 							targetpos = Math.round(ul_scrollable_width*pct),
@@ -281,7 +301,7 @@
 						disp_curpos.innerHTML = currentpos;
 						
 						if(diff!==0) {
-							var easedStep = Math.easeOutQuad(diff, 0, 1, ul_scrollable_width)*10,
+							var easedStep = Math.easeOutQuad(diff, 0, 1, ul_scrollable_width)*55,
 								math,
 								newpos;
 							//console.log(easedStep);
@@ -303,12 +323,18 @@
 							ul.style.left = -newpos+'px';
 							
 							tick();
+						}else {
+							istickon=false;
 						}
 					});
 				}
 				
 				container.onmousemove = setMouseX;
 				container.onmouseout = onScrubIdle;
+				container.onmouseover = function(e) {
+					clearTimeout(mouseout_to);
+					clearTimeout(slideshow_to);
+				}
 				if(isslideshow) { slideshow(); }
 			}
 			
