@@ -59,6 +59,7 @@
 			
 			.thumbpicker { position: relative; width: 790px; height: 110px; background: #888; margin: 0 auto; overflow: hidden; }
 			.thumbpicker > ul { position: absolute; top: 0; left: 0; white-space: nowrap; }
+<<<<<<< HEAD
 			.thumbpicker > ul > li { width: 150px; height: 110px; background: #9d9d9d; margin: 0 0 0 10px; vertical-align: top; display: inline-block; *display:inline; *zoom: 1; }
 			.thumbpicker > ul > li:first-child { margin-left: 0; }
 			.thumbpicker > ul > li > a { display: block; font-size: 30px; line-height: 110px; color: #dfdfdf; text-align: center; text-decoration: none; }
@@ -66,6 +67,11 @@
 			.thumbpicker > ul > li.hover { width: 140px; height: 100px; border: 5px solid #dfdfdf; background: #ccc; }
 			.thumbpicker > ul > li.selected > a,
 			.thumbpicker > ul > li.hover > a { line-height: 100px; color: #fff; }
+=======
+			.thumbpicker > ul > li { width: 150px; height: 110px; background: #9d9d9d; margin-left: 10px; display: inline-block; *display:inline; *zoom: 1; }
+			.thumbpicker > ul > li:first-child { margin-left: 0; }
+			.thumbpicker > ul > li > a { display: block; font-size: 30px; line-height: 110px; color: #fff; text-align: center; text-decoration: none; }
+>>>>>>> a570df97aac4eaeb9689d1b063ebed753f845f9d
 			
 			#display { font-size: 15px; line-height: 15px; margin: 10px; text-align: center; }
 			#display > ul > li { display: block; }
@@ -91,7 +97,20 @@
 		</div>
 		<div class="thumbpicker" id="tp">
 			<ul>
+<<<<<<< HEAD
 				<li><a href="#one">1</a></li><li><a href="#one">2</a></li><li><a href="#one">3</a></li><li><a href="#one">4</a></li><li><a href="#one">5</a></li><li><a href="#one">6</a></li><li><a href="#one">7</a></li><li><a href="#one">8</a></li><li><a href="#one">9</a></li><li><a href="#one">10</a></li><li><a href="#one">11</a></li><li><a href="#one">12</a></li><li><a href="#one">13</a></li><li><a href="#one">14</a></li>
+=======
+				<li><a href="#one">1</a></li>
+				<li><a href="#one">2</a></li>
+				<li><a href="#one">3</a></li>
+				<li><a href="#one">4</a></li>
+				<li><a href="#one">5</a></li>
+				<li><a href="#one">6</a></li>
+				<li><a href="#one">7</a></li>
+				<li><a href="#one">8</a></li>
+				<li><a href="#one">9</a></li>
+				<li><a href="#one">10</a></li>
+>>>>>>> a570df97aac4eaeb9689d1b063ebed753f845f9d
 			</ul>
 		</div>
 		
@@ -112,17 +131,24 @@
 			FS.thumbpicker = function(args) {
 				var container = args.container,
 					scrollpad = args.scrollpad || 0,
+<<<<<<< HEAD
 					isslideshow = args.isslideshow || false,
 					ul = container.getElementsByTagName('ul')[0],
 					lis = ul.getElementsByTagName('li'),
 					selected_li = args['selected-li'] || lis[0],
 					anchors = [],
+=======
+					ul = container.getElementsByTagName('ul')[0],
+>>>>>>> a570df97aac4eaeb9689d1b063ebed753f845f9d
 					thumb_width = ul.getElementsByTagName('li')[0].offsetWidth,
 					container_width = container.offsetWidth,
 					scrollable_width = container_width - (scrollpad*2),
 					ul_width = ul.offsetWidth,
 					ul_scrollable_width = ul_width - container_width,
+<<<<<<< HEAD
 					tick_multiplyer = FS.IE? 80 : 70,
+=======
+>>>>>>> a570df97aac4eaeb9689d1b063ebed753f845f9d
 					requestAnimFrame =
 						window.requestAnimationFrame ||
 						window.webkitRequestAnimationFrame ||
@@ -134,6 +160,7 @@
 							window.setTimeout(fn, 1000 / 30);
 						},
 					mousex = 0,
+<<<<<<< HEAD
 					mouseout_to, /* timeout to stop mouseout from over-firing */
 					slideshow_to, /* timeout for slideshow */
 					istickon = false,
@@ -192,6 +219,10 @@
 						clearTimeout(slideshow_to);
 					}*/
 				}
+=======
+					istickon = false;
+				//alert(ul_width+', '+container_width+', '+ul_scrollable_width);
+>>>>>>> a570df97aac4eaeb9689d1b063ebed753f845f9d
 				
 				document.getElementById('is-ie').getElementsByTagName('span')[0].innerHTML = FS.IE;
 				document.getElementById('cont-wid').getElementsByTagName('span')[0].innerHTML = container_width;
@@ -208,8 +239,12 @@
 					disp_step = document.getElementById('step').getElementsByTagName('span')[0];
 				
 				var setMouseX = function(e) {
+<<<<<<< HEAD
 					clearTimeout(mouseout_to);
 					clearTimeout(slideshow_to);
+=======
+					istickon = true;
+>>>>>>> a570df97aac4eaeb9689d1b063ebed753f845f9d
 					
 					var parentoffset = container.offsetLeft,
 						tempx;
@@ -225,6 +260,7 @@
 					if (tempx < 0){tempx = 0}
 					if (tempx > scrollable_width) {tempx = scrollable_width}
 					mousex = tempx;
+<<<<<<< HEAD
 					disp_mx.innerHTML = mousex;
 					
 					if(!istickon) { tick(); }
@@ -278,6 +314,14 @@
 				
 				var tick = function() {
 					istickon=true;
+=======
+					//console.log(mousex);
+					disp_mx.innerHTML = mousex;
+					tick();
+				}
+				
+				var tick = function() {
+>>>>>>> a570df97aac4eaeb9689d1b063ebed753f845f9d
 					requestAnimFrame(function() {
 						var pct = mousex/scrollable_width,
 							targetpos = Math.round(ul_scrollable_width*pct),
@@ -291,10 +335,17 @@
 						disp_curpos.innerHTML = currentpos;
 						
 						if(diff!==0) {
+<<<<<<< HEAD
 							var easedStep = Math.easeOutQuad(diff, 0, 1, ul_scrollable_width)*tick_multiplyer,
 								math,
 								newpos;
 							//console.log(easedStep);
+=======
+							var easedStep = (Math.easeOutQuad(diff, 0, 1, ul_scrollable_width)*55),
+								math,
+								newpos;
+							console.log(easedStep);
+>>>>>>> a570df97aac4eaeb9689d1b063ebed753f845f9d
 							disp_ease.innerHTML = easedStep;
 							
 							if(currentpos>targetpos) {
@@ -313,13 +364,17 @@
 							ul.style.left = -newpos+'px';
 							
 							tick();
+<<<<<<< HEAD
 						}else {
 							istickon=false;
+=======
+>>>>>>> a570df97aac4eaeb9689d1b063ebed753f845f9d
 						}
 					});
 				}
 				
 				container.onmousemove = setMouseX;
+<<<<<<< HEAD
 				container.onmouseout = onScrubIdle;
 				container.onmouseover = function(e) {
 					clearTimeout(mouseout_to);
@@ -338,10 +393,29 @@
 				isslideshow: true
 				});
 			/*
+=======
+			}
+			
+			FS.thumbpicker({
+				container: document.getElementById('tp'),
+				scrollpad: 80
+				});
+			/*
+			Math.easeInQuad = function (t, b, c, d) {
+				t /= d;
+				return c*t*t + b;
+			};
+			
+>>>>>>> a570df97aac4eaeb9689d1b063ebed753f845f9d
 			for(var i=0; i<30; i++) {
 				
 				console.log(Math.easeOutQuad(i,0,1,29)*4);
 			}*/
+<<<<<<< HEAD
+=======
+			
+			//console.log('live'+requestAnimFrame);
+>>>>>>> a570df97aac4eaeb9689d1b063ebed753f845f9d
 		</script>
 	
 	</body>
