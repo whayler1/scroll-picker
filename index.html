@@ -218,7 +218,7 @@
 					
 				}
 				
-				var setMouseX = function(e) {
+				var setClientX = function(e) {
 					clearTimeout(mouseout_to);
 					clearTimeout(slideshow_to);
 					
@@ -330,7 +330,7 @@
 					});
 				}
 				if(!istouchdevice) {
-					container.onmousemove = setMouseX;
+					container.onmousemove = setClientX;
 					container.onmouseout = onScrubIdle;
 					container.onmouseover = function(e) {
 						clearTimeout(mouseout_to);
@@ -352,7 +352,7 @@
 						//disp_mx.innerHTML = orig;
 						clearTimeout(mouseout_to);
 						clearTimeout(slideshow_to);
-						setMouseX(e);
+						setClientX(e);
 					}
 					container.ontouchend = container.ontouchleave = onScrubIdle;
 				}
