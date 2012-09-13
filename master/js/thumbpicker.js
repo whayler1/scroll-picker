@@ -12,14 +12,14 @@ for(var i=30; i>0; i--) {
 	console.log(Math.easeOutQuad(i,0,1,30)*30);
 }
 */
-
+/*
 var topnum=71,
 	steps=Math.round(topnum*0.3),
 	step=steps
 	;
 
 function t() {
-	num = Math.easeInQuad(((step/steps)*topnum),0,1,topnum)*topnum;
+	var num = Math.easeInQuad(((step/steps)*topnum),0,1,topnum)*topnum;
 	//console.log(newnum);
 	if(step>0) {
 		step--;
@@ -28,7 +28,7 @@ function t() {
 	}
 }
 t();
-
+*/
 
 var FS = {};
 
@@ -69,7 +69,8 @@ FS.thumbpicker = (function() {
 		lasttouchx = 0,
 		touchendx = 0,
 		swipespeed = 0,
-		swipeinc = 0,
+		swipesteps = 0,
+		swipestep = 0,
 		isswipe = false,
 		isswipepositive = false,
 		istouchmoving = false,
@@ -78,8 +79,9 @@ FS.thumbpicker = (function() {
 		HOVER = 'hover';
 	
 	function onLiHit(e) {
-		//console.log('on li hit: '+touchoriginx+', '+touchendx);
-		if(!istouchmoving) {
+		//console.log('on li hit: '+touchoriginx+', '+touchendx+', touchoriginx: '+touchoriginx+', clientx: '+clientx+', this: '+this);
+		if(this===window && istouchdevice) { touchoriginx=clientx; } /* this is dirty. should find a better way of determining if user has swiped or not */
+		if(Math.abs(touchoriginx-clientx)<3 || !istouchdevice) {
 			if(this!==window) {
 				var self=this;
 				selected_li = self;
@@ -123,6 +125,7 @@ FS.thumbpicker = (function() {
 		clearTimeout(mouseout_to);
 		clearTimeout(slideshow_to);
 		lasttouchx = clientx;
+		istouchmoving=true;
 		
 		var parentoffset = container.offsetLeft,
 			tempx;
@@ -163,11 +166,6 @@ FS.thumbpicker = (function() {
 			
 		}, 50);
 	}
-	/*
-	function getClientX(e) {
-		var parentoffset = container.offsetLeft;
-		return e.pageX - parentoffset;
-	}*/
 	
 	function onContainerTouchStart(e) {
 		isswipe=false;
@@ -188,6 +186,7 @@ FS.thumbpicker = (function() {
 			 */
 			var curnum,
 				lislength = lis.length;
+			
 			for(var i=0; i<lislength; i++) {
 				if(lis[i].className===SELECTED) { curnum=i; break; }
 			}
@@ -198,7 +197,6 @@ FS.thumbpicker = (function() {
 			onLiHit();
 			onScrubIdle();
 			slideshow();
-			//console.log('slideshow: '+curnum);
 		}, 4000);
 	}
 	
@@ -234,23 +232,22 @@ FS.thumbpicker = (function() {
 			istickon=false;
 		}
 	}
+	
 	function touchTick() {
-		//console.log('tick');
-		var currentpos = ul.style.left.substr(0, ul.style.left.length-2);
+		var currentpos = Number(ul.style.left.substr(0, ul.style.left.length-2)),
+			isoutofbounds = (currentpos>0 || currentpos<-ul_scrollable_width)?true:false;
 		if(istouchmoving) {
+			var touchoffset = clientx-touchoriginx;
 			
-			var touchoffset = clientx-touchoriginx,
-				newulpos = uloriginx+touchoffset;
-			//console.log(touchoffset+', '+newulpos);
-			/*if(newulpos>0) {
-				newulpos=0;
-				//newulpos=Math.round(Math.easeOutQuad(newulpos, 0, 1, scrollable_width)*(scrollable_width/4));
-				//disp_curpos.innerHTML = Math.round(Math.easeOutQuad(newulpos, 0, 1, scrollable_width)*(scrollable_width/4));
-			}else if(newulpos<-ul_scrollable_width) {
-				newulpos=-ul_scrollable_width;
-				//newulpos=-Math.round(Math.easeInQuad(newulpos, 0, 1, scrollable_width)*(scrollable_width/4));
-				//disp_curpos.innerHTML = Math.round(Math.easeOutQuad(clientx, 0, 1, scrollable_width)*(scrollable_width/4));
-			}*/
+			var	newulpos = uloriginx+touchoffset;
+			if(newulpos>0) {
+				newulpos/=4;
+			}else if(currentpos<=-ul_scrollable_width) {
+				var diff = (ul_scrollable_width+newulpos)/4;
+				//console.log('currentpos<-ul_scrollable_width: '+currentpos+', '+(-ul_scrollable_width)+', '+diff+', '+(diff-ul_scrollable_width));
+				newulpos = Math.round(diff-ul_scrollable_width);
+			}
+			//var	newulpos = currentpos+(clientx-lasttouchx);
 			
 			disp_diff.innerHTML = touchoffset;
 			disp_ease.innerHTML = touchoriginx;
@@ -259,10 +256,16 @@ FS.thumbpicker = (function() {
 			
 			tick();
 		}else if(isswipe) {
+			//console.log('swipe tick');
+			var swipemult = isoutofbounds?(swipespeed/6):swipespeed;
+			var swipeinc = Math.easeInQuad(((swipestep/swipesteps)*swipespeed),0,1,swipespeed)*swipemult;
 			
-			swipeinc = Math.easeInQuad(swipeinc,0,1,swipespeed)*swipespeed;
-			
-			if(Math.round(swipeinc)!=0) {
+			if(swipestep>0) {
+				if(isoutofbounds) {
+					if(swipestep-6>=0) { swipestep-=6; }else { swipestep=0; }
+				}else {
+					swipestep--;
+				}
 				var ulleft=currentpos;
 				ulleft=Number(ulleft)+Math.ceil(swipeinc);
 				//console.log(Math.ceil(swipeinc)+', '+ulleft);
@@ -274,7 +277,7 @@ FS.thumbpicker = (function() {
 				//istickon=false;
 			}
 			tick();
-		}else if(currentpos>0 || currentpos<-ul_scrollable_width) {
+		}else if(isoutofbounds) {
 			//console.log('currentpos>0 || currentpos<-ul_scrollable_width' );
 			var targetpos;
 			
@@ -287,7 +290,7 @@ FS.thumbpicker = (function() {
 			var diff = targetpos - currentpos;
 			
 			if(diff!==0) {
-				var easedStep = Math.easeOutQuad(diff, 0, 1, ul_scrollable_width)*60,
+				var easedStep = Math.easeOutQuad(diff, 0, 1, ul_width)*(ul_width/6),
 					math,
 					newpos;
 				disp_ease.innerHTML = easedStep;
@@ -297,7 +300,7 @@ FS.thumbpicker = (function() {
 				}else {
 					math = Math.ceil;
 				}
-				newpos = math(Number(currentpos)+easedStep);
+				newpos = math(currentpos+easedStep);
 				disp_step.innerHTML = newpos+'px';
 				ul.style.left = newpos+'px';
 				
@@ -305,14 +308,8 @@ FS.thumbpicker = (function() {
 			}
 			tick();
 		}else {
-			
-			
 			istickon=false;
-			
 		}
-		
-		//else { istickon=false; }
-		//tick();
 	}
 	
 	function tick() {
@@ -387,13 +384,11 @@ FS.thumbpicker = (function() {
 			container.ontouchend = function(e) {
 				istouchmoving=false;
 				var swipe = clientx-lasttouchx;
-				//isswipepositive = clientx>lasttouchx?true:false;
-				//console.log('swipe: '+swipe);
+				
 				if(Math.abs(swipe)>2) {
 					isswipe=true;
 					swipespeed = swipe;
-					swipeinc = clientx>lasttouchx?swipe-1:swipe+1;
-					//console.log('MEGAswipe: '+swipe);
+					swipesteps = swipestep = Math.round(Math.abs(swipespeed*0.7));
 				}else {
 					isswipe=false;
 					swipespeed=0;
